@@ -2,11 +2,12 @@
   "id": "velocitab",
   "name": "Velocitab",
   "version": "${version}",
-  "description": "${description}",
-  "url": "https://william278.net/project/velocitab",
+  "description": "Airgalaxie Velocity 4.1 compatibility fork of Velocitab",
+  "url": "https://github.com/airgalaxie/Velocitab",
   "authors": [
     "William278",
-    "AlexDev03"
+    "AlexDev03",
+    "Airgalaxie (fork maintainer)"
   ],
   "dependencies": [
     {

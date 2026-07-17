@@ -17,7 +17,9 @@
  *  limitations under the License.
  */
 
-package net.william278.velocitab.packet;
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
+package net.william278.velocitab.velocityinternal.packet;
 
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;

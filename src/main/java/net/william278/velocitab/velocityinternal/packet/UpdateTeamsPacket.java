@@ -17,7 +17,9 @@
  *  limitations under the License.
  */
 
-package net.william278.velocitab.packet;
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
+package net.william278.velocitab.velocityinternal.packet;
 
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
@@ -29,6 +31,7 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.william278.velocitab.Velocitab;
+import net.william278.velocitab.packet.ScoreboardManager;
 import net.william278.velocitab.player.TabPlayer;
 import net.william278.velocitab.tab.Nametag;
 import org.jetbrains.annotations.NotNull;
@@ -74,10 +77,10 @@ public class UpdateTeamsPacket implements MinecraftPacket {
     }
 
     @NotNull
-    protected static UpdateTeamsPacket create(@NotNull Velocitab plugin, @NotNull TabPlayer tabPlayer,
-                                              @NotNull String teamName, @NotNull Nametag nametag,
-                                              @NotNull TabPlayer viewer,
-                                              @NotNull String... teamMembers) {
+    public static UpdateTeamsPacket create(@NotNull Velocitab plugin, @NotNull TabPlayer tabPlayer,
+                                           @NotNull String teamName, @NotNull Nametag nametag,
+                                           @NotNull TabPlayer viewer,
+                                           @NotNull String... teamMembers) {
         return new UpdateTeamsPacket(plugin)
                 .teamName(teamName)
                 .mode(UpdateMode.CREATE_TEAM)
@@ -100,9 +103,9 @@ public class UpdateTeamsPacket implements MinecraftPacket {
     }
 
     @NotNull
-    protected static UpdateTeamsPacket changeNametag(@NotNull Velocitab plugin, @NotNull TabPlayer tabPlayer,
-                                                     @NotNull String teamName, @NotNull TabPlayer viewer,
-                                                     @NotNull Nametag nametag) {
+    public static UpdateTeamsPacket changeNametag(@NotNull Velocitab plugin, @NotNull TabPlayer tabPlayer,
+                                                  @NotNull String teamName, @NotNull TabPlayer viewer,
+                                                  @NotNull Nametag nametag) {
         return new UpdateTeamsPacket(plugin)
                 .teamName(teamName)
                 .mode(UpdateMode.UPDATE_INFO)
@@ -134,7 +137,7 @@ public class UpdateTeamsPacket implements MinecraftPacket {
     }
 
     @NotNull
-    protected static UpdateTeamsPacket removeTeam(@NotNull Velocitab plugin, @NotNull String teamName) {
+    public static UpdateTeamsPacket removeTeam(@NotNull Velocitab plugin, @NotNull String teamName) {
         return new UpdateTeamsPacket(plugin)
                 .teamName(teamName)
                 .mode(UpdateMode.REMOVE_TEAM);

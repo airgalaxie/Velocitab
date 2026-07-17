@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.config;
 
 import com.velocitypowered.api.plugin.PluginContainer;
@@ -138,7 +140,7 @@ public interface ConfigProvider {
         final Metadata metadata = getMetadata();
         final Version proxyVersion = getVelocityVersion();
         metadata.validateApiVersion(proxyVersion);
-        metadata.validateBuild(proxyVersion);
+        //metadata.validateBuild(proxyVersion);
 
         // Validate PAPIProxyBridge hook version
         final Optional<Version> papiProxyBridgeVersion = getPapiProxyBridgeVersion();

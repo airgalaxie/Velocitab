@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.api;
 
 import lombok.Getter;
@@ -28,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Fired when Velocitab is about to set a player's display name in the tab list.
  * <p>
- * Listeners may modify {@link #setDisplayName(Component)} to transform the component
+ * Listeners may modify {@code setDisplayName(Component)} to transform the component
  * before it is sent (e.g. to resolve custom font glyphs).
  * This event is a pure transformation hook and is not cancellable.
  *

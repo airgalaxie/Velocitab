@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.player;
 
 import com.google.common.collect.Maps;
@@ -27,8 +29,8 @@ import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import net.william278.velocitab.Velocitab;
 import net.william278.velocitab.config.Group;
-import net.william278.velocitab.packet.UpdateTeamsPacket;
 import net.william278.velocitab.tab.Nametag;
+import net.william278.velocitab.velocityinternal.packet.UpdateTeamsPacket;
 import net.william278.velocitab.tab.PlayerTabList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

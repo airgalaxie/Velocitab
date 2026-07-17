@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.api;
 
 import lombok.Getter;
@@ -28,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Fired when Velocitab is about to send the tab list header and footer to a player.
  * <p>
- * Listeners may modify {@link #setHeader(Component)} and/or {@link #setFooter(Component)}
+ * Listeners may modify {@code setHeader(Component)} and/or {@code setFooter(Component)}
  * to transform the components before they are sent (e.g. to resolve custom font glyphs).
  * This event is a pure transformation hook and is not cancellable.
  *

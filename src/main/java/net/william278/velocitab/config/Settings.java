@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.config;
 
 import de.exlll.configlib.Comment;
@@ -124,5 +126,4 @@ public class Settings implements ConfigValidator {
         }
         serverLinks.forEach(ServerUrl::validate);
     }
-
 }

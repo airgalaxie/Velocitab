@@ -17,7 +17,9 @@
  *  limitations under the License.
  */
 
-package net.william278.velocitab.packet;
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
+package net.william278.velocitab.velocityinternal.packet;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
@@ -29,6 +31,7 @@ import io.netty.channel.ChannelPromise;
 import lombok.RequiredArgsConstructor;
 import net.william278.velocitab.Velocitab;
 import net.william278.velocitab.config.Group;
+import net.william278.velocitab.packet.ScoreboardManager;
 import net.william278.velocitab.player.TabPlayer;
 import net.william278.velocitab.util.DebugSystem;
 import org.jetbrains.annotations.NotNull;

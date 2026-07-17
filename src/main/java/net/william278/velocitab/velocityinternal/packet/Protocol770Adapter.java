@@ -17,13 +17,13 @@
  *  limitations under the License.
  */
 
-package net.william278.velocitab.packet;
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
+package net.william278.velocitab.velocityinternal.packet;
 
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import io.netty.buffer.ByteBuf;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.william278.velocitab.Velocitab;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,33 +32,20 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Adapter for handling the UpdateTeamsPacket for Minecraft 1.13.2-1.15.2
+ * Adapter for handling the UpdateTeamsPacket for Minecraft 1.21.5+
  */
-@SuppressWarnings("DuplicatedCode")
-public class Protocol404Adapter extends TeamsPacketAdapter {
+public class Protocol770Adapter extends Protocol765Adapter {
 
-    private final GsonComponentSerializer serializer;
-
-    public Protocol404Adapter(@NotNull Velocitab plugin) {
+    public Protocol770Adapter(@NotNull Velocitab plugin) {
         super(plugin, Set.of(
-                ProtocolVersion.MINECRAFT_1_13,
-                ProtocolVersion.MINECRAFT_1_13_1,
-                ProtocolVersion.MINECRAFT_1_13_2,
-                ProtocolVersion.MINECRAFT_1_14,
-                ProtocolVersion.MINECRAFT_1_14_1,
-                ProtocolVersion.MINECRAFT_1_14_2,
-                ProtocolVersion.MINECRAFT_1_14_3,
-                ProtocolVersion.MINECRAFT_1_14_4,
-                ProtocolVersion.MINECRAFT_1_15,
-                ProtocolVersion.MINECRAFT_1_15_1,
-                ProtocolVersion.MINECRAFT_1_15_2
+                ProtocolVersion.MINECRAFT_1_21_5,
+                ProtocolVersion.MINECRAFT_1_21_6,
+                ProtocolVersion.MINECRAFT_1_21_7,
+                ProtocolVersion.MINECRAFT_1_21_9,
+                ProtocolVersion.MINECRAFT_1_21_11,
+                ProtocolVersion.MINECRAFT_26_1,
+                ProtocolVersion.MINECRAFT_26_2
         ));
-        serializer = GsonComponentSerializer.colorDownsamplingGson();
-    }
-
-    public Protocol404Adapter(@NotNull Velocitab plugin, Set<ProtocolVersion> protocolVersions) {
-        super(plugin, protocolVersions);
-        serializer = GsonComponentSerializer.colorDownsamplingGson();
     }
 
     @Override
@@ -71,12 +58,21 @@ public class Protocol404Adapter extends TeamsPacketAdapter {
         }
         if (mode == UpdateTeamsPacket.UpdateMode.CREATE_TEAM || mode == UpdateTeamsPacket.UpdateMode.UPDATE_INFO) {
             packet.displayName(readComponent(byteBuf));
-            packet.friendlyFlags(UpdateTeamsPacket.FriendlyFlag.fromBitMask(byteBuf.readByte()));
-            packet.nametagVisibility(UpdateTeamsPacket.NametagVisibility.byId(ProtocolUtils.readString(byteBuf)));
-            packet.collisionRule(UpdateTeamsPacket.CollisionRule.byId(ProtocolUtils.readString(byteBuf)));
-            packet.color(byteBuf.readByte());
-            packet.prefix(readComponent(byteBuf));
-            packet.suffix(readComponent(byteBuf));
+            if (protocolVersion.noLessThan(ProtocolVersion.MINECRAFT_26_2)) {
+                packet.prefix(readComponent(byteBuf));
+                packet.suffix(readComponent(byteBuf));
+                packet.nametagVisibility(UpdateTeamsPacket.NametagVisibility.byOrdinal(ProtocolUtils.readVarInt(byteBuf)));
+                packet.collisionRule(UpdateTeamsPacket.CollisionRule.byOrdinal(ProtocolUtils.readVarInt(byteBuf)));
+                packet.color(byteBuf.readBoolean() ? ProtocolUtils.readVarInt(byteBuf) : 21);
+                packet.friendlyFlags(UpdateTeamsPacket.FriendlyFlag.fromBitMask(byteBuf.readByte()));
+            } else {
+                packet.friendlyFlags(UpdateTeamsPacket.FriendlyFlag.fromBitMask(byteBuf.readByte()));
+                packet.nametagVisibility(UpdateTeamsPacket.NametagVisibility.byOrdinal(ProtocolUtils.readVarInt(byteBuf)));
+                packet.collisionRule(UpdateTeamsPacket.CollisionRule.byOrdinal(ProtocolUtils.readVarInt(byteBuf)));
+                packet.color(byteBuf.readByte());
+                packet.prefix(readComponent(byteBuf));
+                packet.suffix(readComponent(byteBuf));
+            }
         }
         if (mode == UpdateTeamsPacket.UpdateMode.CREATE_TEAM || mode == UpdateTeamsPacket.UpdateMode.ADD_PLAYERS || mode == UpdateTeamsPacket.UpdateMode.REMOVE_PLAYERS) {
             int count = ProtocolUtils.readVarInt(byteBuf);
@@ -98,12 +94,24 @@ public class Protocol404Adapter extends TeamsPacketAdapter {
         }
         if (mode == UpdateTeamsPacket.UpdateMode.CREATE_TEAM || mode == UpdateTeamsPacket.UpdateMode.UPDATE_INFO) {
             writeComponent(byteBuf, packet.displayName());
-            byteBuf.writeByte(UpdateTeamsPacket.FriendlyFlag.toBitMask(packet.friendlyFlags()));
-            ProtocolUtils.writeString(byteBuf, packet.nametagVisibility().id());
-            ProtocolUtils.writeString(byteBuf, packet.collisionRule().id());
-            byteBuf.writeByte(packet.color());
-            writeComponent(byteBuf, packet.prefix());
-            writeComponent(byteBuf, packet.suffix());
+            if (protocolVersion.noLessThan(ProtocolVersion.MINECRAFT_26_2)) {
+                writeComponent(byteBuf, packet.prefix());
+                writeComponent(byteBuf, packet.suffix());
+                ProtocolUtils.writeVarInt(byteBuf, packet.nametagVisibility().ordinal());
+                ProtocolUtils.writeVarInt(byteBuf, packet.collisionRule().ordinal());
+                byteBuf.writeBoolean(packet.color() != 21);
+                if (packet.color() != 21) {
+                    ProtocolUtils.writeVarInt(byteBuf, Math.min(15, packet.color()));
+                }
+                byteBuf.writeByte(UpdateTeamsPacket.FriendlyFlag.toBitMask(packet.friendlyFlags()));
+            } else {
+                byteBuf.writeByte(UpdateTeamsPacket.FriendlyFlag.toBitMask(packet.friendlyFlags()));
+                ProtocolUtils.writeVarInt(byteBuf, packet.nametagVisibility().ordinal());
+                ProtocolUtils.writeVarInt(byteBuf, packet.collisionRule().ordinal());
+                byteBuf.writeByte(packet.color());
+                writeComponent(byteBuf, packet.prefix());
+                writeComponent(byteBuf, packet.suffix());
+            }
         }
         if (mode == UpdateTeamsPacket.UpdateMode.CREATE_TEAM || mode == UpdateTeamsPacket.UpdateMode.ADD_PLAYERS || mode == UpdateTeamsPacket.UpdateMode.REMOVE_PLAYERS) {
             List<String> entities = packet.entities();
@@ -112,15 +120,6 @@ public class Protocol404Adapter extends TeamsPacketAdapter {
                 ProtocolUtils.writeString(byteBuf, entity);
             }
         }
-    }
-
-    protected void writeComponent(@NotNull ByteBuf buf, @NotNull Component component) {
-        ProtocolUtils.writeString(buf, serializer.serialize(component));
-    }
-
-    @NotNull
-    protected Component readComponent(@NotNull ByteBuf buf) {
-        return serializer.deserialize(ProtocolUtils.readString(buf));
     }
 
 }

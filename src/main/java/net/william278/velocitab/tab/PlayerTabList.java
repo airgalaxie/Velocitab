@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.tab;
 
 import com.google.common.collect.Maps;
@@ -29,8 +31,6 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.velocitypowered.api.util.ServerLink;
-import com.velocitypowered.proxy.tablist.KeyedVelocityTabList;
-import com.velocitypowered.proxy.tablist.VelocityTabList;
 import it.unimi.dsi.fastutil.Pair;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -43,11 +43,11 @@ import net.william278.velocitab.packet.ScoreboardManager;
 import net.william278.velocitab.player.Role;
 import net.william278.velocitab.player.TabPlayer;
 import net.william278.velocitab.util.DebugSystem;
+import net.william278.velocitab.velocityinternal.VelocityInternalTabListAccess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.event.Level;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -66,37 +66,16 @@ public class PlayerTabList {
     private final Map<UUID, TabPlayer> players;
     @Getter(value = AccessLevel.PUBLIC)
     private final TaskManager taskManager;
-    private final Map<Class<?>, Field> entriesFields;
+    private final VelocityInternalTabListAccess tabListAccess;
 
     public PlayerTabList(@NotNull Velocitab plugin) {
         this.plugin = plugin;
         this.vanishTabList = new VanishTabList(plugin, this);
         this.players = Maps.newConcurrentMap();
         this.taskManager = new TaskManager(plugin);
-        this.entriesFields = Maps.newHashMap();
         this.registerListener();
         this.ensureDisplayNameTask();
-        this.registerFields();
-    }
-
-    // VelocityTabListLegacy is not supported
-    private void registerFields() {
-        final Class<KeyedVelocityTabList> keyedVelocityTabListClass = KeyedVelocityTabList.class;
-        final Class<VelocityTabList> velocityTabListClass = VelocityTabList.class;
-        try {
-            final Field entriesField = keyedVelocityTabListClass.getDeclaredField("entries");
-            entriesField.setAccessible(true);
-            this.entriesFields.put(keyedVelocityTabListClass, entriesField);
-        } catch (NoSuchFieldException e) {
-            plugin.log(Level.ERROR, "Failed to register KeyedVelocityTabList field", e);
-        }
-        try {
-            final Field entriesField = velocityTabListClass.getDeclaredField("entries");
-            entriesField.setAccessible(true);
-            this.entriesFields.put(velocityTabListClass, entriesField);
-        } catch (NoSuchFieldException e) {
-            plugin.log(Level.ERROR, "Failed to register VelocityTabList field", e);
-        }
+        this.tabListAccess = new VelocityInternalTabListAccess(plugin);
     }
 
     private void registerListener() {
@@ -294,23 +273,8 @@ public class PlayerTabList {
         return plugin.getFormatter().format(toParse, player, plugin);
     }
 
-    @SuppressWarnings("unchecked")
     private void fixDuplicateEntries(@NotNull Player target) {
-        try {
-            final Optional<Field> optionalField = Optional.ofNullable(this.entriesFields.get(target.getTabList().getClass()));
-            if (optionalField.isEmpty()) {
-                return;
-            }
-            final Field entriesField = optionalField.get();
-            final Map<UUID, TabListEntry> entries = (Map<UUID, TabListEntry>) entriesField.get(target.getTabList());
-            entries.entrySet().stream()
-                    .filter(entry -> entry.getValue().getProfile() != null)
-                    .filter(entry -> entry.getValue().getProfile().getId().equals(target.getUniqueId()))
-                    .filter(entry -> !entry.getKey().equals(target.getUniqueId()))
-                    .forEach(entry -> target.getTabList().removeEntry(entry.getKey()));
-        } catch (Throwable error) {
-            plugin.log(Level.ERROR, "Failed to fix duplicate entries for class " + target.getTabList().getClass().getName(), error);
-        }
+        tabListAccess.fixDuplicateEntries(target);
     }
 
     protected void removePlayer(@NotNull Player target) {

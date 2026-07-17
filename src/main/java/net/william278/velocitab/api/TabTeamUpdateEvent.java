@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.api;
 
 import com.velocitypowered.api.proxy.Player;
@@ -30,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Fired when Velocitab is about to send a scoreboard team (nametag) packet for a player.
  * <p>
- * Listeners may modify {@link #setPrefix(Component)}, {@link #setSuffix(Component)},
- * and/or {@link #setDisplayName(Component)} to transform the components before the
+ * Listeners may modify {@code setPrefix(Component)}, {@code setSuffix(Component)},
+ * and/or {@code setDisplayName(Component)} to transform the components before the
  * packet is sent (e.g. to resolve custom font glyphs).
  * This event is a pure transformation hook and is not cancellable.
  *

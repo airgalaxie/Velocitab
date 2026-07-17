@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.commands;
 
 import com.mojang.brigadier.Command;
@@ -79,7 +81,8 @@ public final class VelocitabCommand {
                 .version(plugin.getVersion())
                 .credits("Authors",
                         AboutMenu.Credit.of("William278").description("Click to visit website").url("https://william278.net"),
-                        AboutMenu.Credit.of("AlexDev03").description("Click to visit GitHub").url("https://github.com/alexdev03"))
+                        AboutMenu.Credit.of("AlexDev03").description("Click to visit GitHub").url("https://github.com/alexdev03"),
+                        AboutMenu.Credit.of("(Modified by Airgalaxie)").description("Click to visit GitHub").url("https://static-mc.airgalaxie.de"))
                 .credits("Contributors",
                         AboutMenu.Credit.of("Ironboundred").description("Code"),
                         AboutMenu.Credit.of("Emibergo02").description("Code"),

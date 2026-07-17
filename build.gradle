@@ -2,16 +2,23 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'xyz.jpenilla.run-velocity' version '3.0.2'
-    id 'com.gradleup.shadow' version '8.3.8'
-    id 'org.cadixdev.licenser' version '0.6.1'
-    id 'org.ajoberstar.grgit' version '5.3.2'
+    id 'com.gradleup.shadow' version '9.5.1'
+    id "dev.yumi.gradle.licenser" version "2.2.2"
+    id("com.diffplug.spotless") version '8.5.1'
+    id 'org.ajoberstar.grgit' version '5.3.3'
     id 'maven-publish'
     id 'java'
 }
 
-group 'net.william278'
-version "$ext.plugin_version${versionMetadata()}"
-description "$ext.plugin_description"
+if (!ext.has('airgalaxieBuildTimestamp')) {
+    ext.set('airgalaxieBuildTimestamp', java.time.ZonedDateTime
+            .now(java.time.ZoneId.of('Europe/Berlin'))
+            .format(java.time.format.DateTimeFormatter.ofPattern('yyMMddHHmm')))
+}
+
+group = 'net.william278'
+version = "$ext.plugin_version${versionMetadata()}"
+description = "$ext.plugin_description"
 defaultTasks 'licenseFormat', 'build'
 
 ext {
@@ -25,6 +32,7 @@ ext {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     maven { url = 'https://repo.william278.net/velocity/' }
@@ -35,11 +43,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.velocitypowered:velocity-api:${velocity_compile_api_version}-SNAPSHOT"
+    compileOnly "com.velocitypowered:velocity-api:${velocity_api_version}-SNAPSHOT"
     compileOnly "com.velocitypowered:velocity-proxy:${velocity_compile_api_version}-SNAPSHOT"
     compileOnly "net.william278:papiproxybridge:${papi_proxy_bridge_minimum_version}"
 
-    compileOnly 'io.netty:netty-codec-http:4.2.2.Final'
+    compileOnly 'io.netty:netty-codec-http:4.2.16.Final'
     compileOnly 'org.projectlombok:lombok:1.18.38'
     compileOnly 'net.luckperms:api:5.5'
     compileOnly 'io.github.miniplaceholders:miniplaceholders-api:3.0.1'
@@ -75,26 +83,54 @@ processResources {
     }
 }
 
+//license {
+//    header = rootProject.file('HEADER')
+//    include '**/*.java'
+//    newLine = true
+//}
+
 license {
-    header = rootProject.file('HEADER')
-    include '**/*.java'
-    newLine = true
+    // Add a license header rule, at least one must be present.
+    rule(rootProject.file('HEADER'))
+
+    // Exclude/include certain file types, defaults are provided to easily deal with Java/Kotlin projects.
+    include("**/*.java") // Include Java files into the file resolution.
+    exclude("**/*.properties") // Exclude properties files from the file resolution.
 }
 
 logger.lifecycle("Building Velocitab ${version} by William278 & AlexDev03")
-version rootProject.version
-archivesBaseName = "${rootProject.name}"
+version = rootProject.version
+base.archivesName = "${rootProject.name}-Airgalaxie"
 
 compileJava.options.encoding = 'UTF-8'
 javadoc.options.encoding = 'UTF-8'
 javadoc.options.addStringOption('Xdoclint:none', '-quiet')
 
+def targetJavaVersion = javaVersion.toInteger()
+def compilerJavaVersion = buildJavaVersion.toInteger()
+
 java {
-    def javaVersion = JavaVersion.toVersion(javaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+    def targetVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = targetVersion
+    targetCompatibility = targetVersion
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(compilerJavaVersion)
+    }
     withSourcesJar()
     withJavadocJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = targetJavaVersion
+}
+
+tasks.withType(Jar).configureEach {
+    from(rootProject.file('LICENSE')) {
+        into 'META-INF'
+    }
+    from(rootProject.file('FORK-NOTICE.md')) {
+        into 'META-INF'
+    }
 }
 
 shadowJar {
@@ -191,15 +227,12 @@ def versionMetadata() {
         return '-unknown'
     }
 
-    // If unclean, return the last commit hash with -indev
-    if (!grgit.status().clean) {
-        return '-' + grgit.head().abbreviatedId  + '-indev'
-    }
-
-    // Otherwise if this matches a tag, return nothing
+    // If this matches a tag, return nothing
     def tag = grgit.tag.list().find { it.commit.id == grgit.head().id }
     if (tag != null) {
         return ''
     }
-    return '-' + grgit.head().abbreviatedId
+
+    // Otherwise return the last commit hash with -indev and build timestamp
+    return '-' + grgit.head().abbreviatedId + '-indev-' + rootProject.ext.get('airgalaxieBuildTimestamp')
 }

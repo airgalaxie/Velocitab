@@ -17,6 +17,8 @@
  *  limitations under the License.
  */
 
+// Modified by Jens Hoffmann (Airgalaxie) in 2026. See FORK-NOTICE.md.
+
 package net.william278.velocitab.packet;
 
 import com.google.common.collect.Maps;
@@ -27,9 +29,6 @@ import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.protocol.ProtocolUtils;
-import com.velocitypowered.proxy.protocol.StateRegistry;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.william278.velocitab.Velocitab;
@@ -39,6 +38,15 @@ import net.william278.velocitab.player.TabPlayer;
 import net.william278.velocitab.sorting.SortedSet;
 import net.william278.velocitab.tab.Nametag;
 import net.william278.velocitab.util.DebugSystem;
+import net.william278.velocitab.velocityinternal.VelocityInternalPacketBridge;
+import net.william278.velocitab.velocityinternal.packet.PacketRegistration;
+import net.william278.velocitab.velocityinternal.packet.Protocol404Adapter;
+import net.william278.velocitab.velocityinternal.packet.Protocol48Adapter;
+import net.william278.velocitab.velocityinternal.packet.Protocol735Adapter;
+import net.william278.velocitab.velocityinternal.packet.Protocol765Adapter;
+import net.william278.velocitab.velocityinternal.packet.Protocol770Adapter;
+import net.william278.velocitab.velocityinternal.packet.TeamsPacketAdapter;
+import net.william278.velocitab.velocityinternal.packet.UpdateTeamsPacket;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.event.Level;
 
@@ -51,6 +59,7 @@ public class ScoreboardManager {
     private PacketRegistration<UpdateTeamsPacket> packetRegistration;
     private final Velocitab plugin;
     private final boolean teams;
+    private final VelocityInternalPacketBridge packetBridge;
     private final Map<ProtocolVersion, TeamsPacketAdapter> versions;
     @Getter
     private final Map<UUID, String> createdTeams;
@@ -62,6 +71,7 @@ public class ScoreboardManager {
     public ScoreboardManager(@NotNull Velocitab velocitab, boolean teams) {
         this.plugin = velocitab;
         this.teams = teams;
+        this.packetBridge = new VelocityInternalPacketBridge();
         this.createdTeams = Maps.newConcurrentMap();
         this.nametags = Maps.newConcurrentMap();
         this.versions = Maps.newHashMap();
@@ -423,8 +433,7 @@ public class ScoreboardManager {
             return;
         }
 
-        final ConnectedPlayer connectedPlayer = (ConnectedPlayer) player;
-        connectedPlayer.getConnection().write(packet);
+        packetBridge.sendPacket(player, packet);
     }
 
     public void registerPacket() {
@@ -432,10 +441,7 @@ public class ScoreboardManager {
             return;
         }
         try {
-            packetRegistration = PacketRegistration.of(UpdateTeamsPacket.class)
-                    .direction(ProtocolUtils.Direction.CLIENTBOUND)
-                    .packetSupplier(() -> new UpdateTeamsPacket(plugin))
-                    .stateRegistry(StateRegistry.PLAY)
+            packetRegistration = packetBridge.createUpdateTeamsPacketRegistration(plugin)
                     .mapping(0x3E, MINECRAFT_1_8, false)
                     .mapping(0x44, MINECRAFT_1_12_2, false)
                     .mapping(0x47, MINECRAFT_1_13, false)

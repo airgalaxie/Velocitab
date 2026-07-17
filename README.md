@@ -26,6 +26,31 @@
 </p>
 <br/>
 
+## Airgalaxie Velocity 4.1 compatibility fork
+
+This repository is an experimental development fork of [Velocitab](https://github.com/WiIIiam278/Velocitab), originally created by William278 and its contributors.
+
+The fork maintains Velocitab compatibility with Velocity 4.1 development builds. It isolates the required internal Velocity proxy integration behind a dedicated `velocityinternal` compatibility layer while preserving the existing packet, Netty, protocol, sorting, and nametag behavior.
+
+This fork is maintained independently by Airgalaxie and is not an official Velocitab release. For the original project, official releases, documentation, and support, please use the upstream Velocitab repository.
+
+See [FORK-NOTICE.md](FORK-NOTICE.md) for fork attribution, modification, and support details.
+
+### Development status
+
+- Target runtime: Velocity 4.1 development builds
+- Public integration: `velocity-api`
+- Required internal compatibility dependency: `velocity-proxy`
+- `velocity-proxy` remains a `compileOnly` dependency
+- The internal proxy artifact must currently be available through Maven Local
+- The compatibility work is maintained on the `airgalaxie/velocity-4.1` branch
+
+### Additional fork changes
+
+- Updated Gradle build tooling
+- Replaced the Cadix license plugin with Yumi Gradle Licenser
+- Added timestamped identifiers for internal development builds
+
 **Velocitab** is a super-simple Velocity TAB menu plugin that uses scoreboard team client-bound packets to actually sort player lists without the need for a backend plugin. Supporting modern RGB formatting, animations, comprehensive placeholder support and defining multiple TAB menus for different groups of servers, Velocitab is a versatile plugin, useful for any Velocity-based proxy network.
 
 ![Showcase of different TAB menus made with Velocitab.png](images/showcase.png)
@@ -62,6 +87,8 @@ To build Velocitab, run the following in the root of the repository:
 ./gradlew clean build
 ```
 The build will be output as `/target/Velocitab-x.xx.jar`.
+
+Building this fork requires locally publishing the matching `com.velocitypowered:velocity-proxy:4.1.0-SNAPSHOT` artifact and making `mavenLocal()` available before the external repositories.
 
 ### License
 Velocitab is licensed under the Apache 2.0 license.
