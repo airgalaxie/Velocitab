@@ -2,7 +2,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'xyz.jpenilla.run-velocity' version '3.0.2'
-    id 'com.gradleup.shadow' version '9.5.1'
+    id 'com.gradleup.shadow' version '9.6.1'
     id "dev.yumi.gradle.licenser" version "2.2.2"
     id("com.diffplug.spotless") version '8.5.1'
     id 'org.ajoberstar.grgit' version '5.3.3'
