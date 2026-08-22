@@ -82,7 +82,7 @@ public final class VelocitabCommand {
                 .credits("Authors",
                         AboutMenu.Credit.of("William278").description("Click to visit website").url("https://william278.net"),
                         AboutMenu.Credit.of("AlexDev03").description("Click to visit GitHub").url("https://github.com/alexdev03"),
-                        AboutMenu.Credit.of("(Modified by Airgalaxie)").description("Click to visit GitHub").url("https://static-mc.airgalaxie.de"))
+                        AboutMenu.Credit.of("(Modified by Airgalaxie)").description("Click to visit GitHub").url("https://github.com/airgalaxie"))
                 .credits("Contributors",
                         AboutMenu.Credit.of("Ironboundred").description("Code"),
                         AboutMenu.Credit.of("Emibergo02").description("Code"),
