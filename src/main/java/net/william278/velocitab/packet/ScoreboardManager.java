@@ -456,7 +456,7 @@ public class ScoreboardManager {
                     .mapping(0x6F, ProtocolVersion.valueOf("MINECRAFT_26_3"), false);
             packetRegistration.register();
         } catch (Throwable e) {
-            plugin.log(Level.ERROR, "Failed to register UpdateTeamsPacket", e);
+            throw new IllegalStateException("Failed to register UpdateTeamsPacket; cannot initialize scoreboard teams", e);
         }
     }
 
