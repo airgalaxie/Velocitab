@@ -14,7 +14,12 @@ jobs:
     steps:
       - name: 'Checkout for CI 🛎'
         uses: actions/checkout@v4
-      - name: 'Set up JDK 21 📦'
+      - name: 'Set up JDK 25 for runtime tests 📦'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+      - name: 'Set up JDK 21 for compilation 📦'
         uses: actions/setup-java@v4
         with:
           java-version: '21'
