@@ -11,7 +11,7 @@ The original copyright, license, and attribution notices remain in place.
 
 This fork continues to be distributed under the Apache License 2.0.
 
-Airgalaxie-specific changes include support work for Velocity 4.1 development
+Airgalaxie-specific changes include support work for Velocity 4.2.x development
 builds, including an internal compatibility layer, packet, Netty, and protocol
 adaptations, Gradle build tooling updates, and build metadata changes for
 internal development builds.

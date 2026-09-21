@@ -26,11 +26,11 @@
 </p>
 <br/>
 
-## Airgalaxie Velocity 4.1 compatibility fork
+## Airgalaxie Velocity 4.2.x compatibility fork
 
 This repository is an experimental development fork of [Velocitab](https://github.com/WiIIiam278/Velocitab), originally created by William278 and its contributors.
 
-The fork maintains Velocitab compatibility with Velocity 4.1 development builds. It isolates the required internal Velocity proxy integration behind a dedicated `velocityinternal` compatibility layer while preserving the existing packet, Netty, protocol, sorting, and nametag behavior.
+The fork maintains Velocitab compatibility with Velocity 4.2.x development builds. It isolates the required internal Velocity proxy integration behind a dedicated `velocityinternal` compatibility layer while preserving the existing packet, Netty, protocol, sorting, and nametag behavior.
 
 This fork is maintained independently by Airgalaxie and is not an official Velocitab release. For the original project, official releases, documentation, and support, please use the upstream Velocitab repository.
 
@@ -38,12 +38,12 @@ See [FORK-NOTICE.md](FORK-NOTICE.md) for fork attribution, modification, and sup
 
 ### Development status
 
-- Target runtime: Velocity 4.1 development builds
+- Target runtime: Velocity 4.2.x development builds
 - Public integration: `velocity-api`
 - Required internal compatibility dependency: `velocity-proxy`
 - `velocity-proxy` remains a `compileOnly` dependency
 - The internal proxy artifact must currently be available through Maven Local
-- The compatibility work is maintained on the `airgalaxie/velocity-4.1` branch
+- The compatibility work is maintained on the `airgalaxie/velocity-4.2.x` branch
 
 ### Additional fork changes
 
