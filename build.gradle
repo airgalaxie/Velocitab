@@ -64,6 +64,48 @@ dependencies {
     implementation 'net.william278.toilet:toilet-velocity:1.0.14'
 
     annotationProcessor 'org.projectlombok:lombok:1.18.38'
+
+    testImplementation "com.velocitypowered:velocity-proxy:${velocity_compile_api_version}-SNAPSHOT"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+configurations {
+    testImplementation.extendsFrom compileOnly
+}
+
+// Compile against the published proxy internals, but test the actual supported runtime.
+// Velocity 4.2 proxy internals are not published as a standalone Maven dependency.
+def velocityTestJar = layout.buildDirectory.file('test-runtime/velocity-4.2.0-30.jar')
+def velocityTestSha256 = '35a5596a5468a035d8a32c8de5ebb0dc6b8d8f0cc3ff5169d514aca762af8aa8'
+tasks.register('prepareVelocityTestRuntime') {
+    outputs.file(velocityTestJar)
+    doLast {
+        def jar = velocityTestJar.get().asFile
+        jar.parentFile.mkdirs()
+        def connection = new URI("https://fill-data.papermc.io/v1/objects/${velocityTestSha256}/velocity-4.2.0-30.jar").toURL().openConnection()
+        connection.setRequestProperty('User-Agent', 'Velocitab compatibility tests')
+        connection.connectTimeout = 30000
+        connection.readTimeout = 60000
+        connection.inputStream.withCloseable { input ->
+            jar.withOutputStream { output -> output << input }
+        }
+        def digest = java.security.MessageDigest.getInstance('SHA-256').digest(jar.bytes).encodeHex().toString()
+        if (digest != velocityTestSha256) {
+            jar.delete()
+            throw new GradleException('Velocity test runtime SHA-256 mismatch')
+        }
+    }
+}
+
+test {
+    dependsOn tasks.named('prepareVelocityTestRuntime')
+    useJUnitPlatform()
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    // The distribution supplies the runtime API, internals and matching bundled libraries.
+    classpath = files(velocityTestJar) + classpath
 }
 
 processResources {
